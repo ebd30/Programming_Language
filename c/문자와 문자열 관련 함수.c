@@ -88,4 +88,22 @@ fputs(): 두 번째 인자를 통해 출력의 대상을 결정할 수 있다.
 
   -문자열 입력 함수:gets, fgets
 #include <stdio.h>
+char * gets(char * s);
+char * fgets(char * s, int n, FILE * stream); -> 파일의 끝에 도달하거나 함수호출 실패 시 NULL 포인터 반환
+
+gets() 함수 호출 유형
+int main(void)
+{
+  char str[7]; // 7byte 메모리 공간 할당
+  gets(str); // 입력 받은 문자열을 배열 str에 저장
+  ....
+}
+미리 마련해 놓은 배열을 넘어서는 길이의 문자열이 입력되면, 할당 받지 않은 메모리 공간을 침범하여 실행 중 오류가 발생함. 그래서 가급적 다음의 형태로 fgets 함수를 호출하는 것이 좋다.
+int main(void)
+{
+  char str[7];
+  fgets(str, sizeof(str), stdin); // stdin으로부터 문자열 입력 받아 str에 저장
+}
+stdin으로부터 문자열을 입력 받아 배열str에 저장하되, sizeof(str)의 길이만큼 저장해라는 의미다.
+
 */
