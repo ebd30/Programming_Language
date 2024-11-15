@@ -106,4 +106,22 @@ int main(void)
 }
 stdin으로부터 문자열을 입력 받아 배열str에 저장하되, sizeof(str)의 길이만큼 저장해라는 의미다.
 
+ex) "123456789" 입력되면 sizeof(str)의 반환 값인 7보다 1작은 6을 길이로 문자열만 읽어 str에 저장하게 된다. "123456" 이 저장되는 것이다.
+문자열을 입력받으면 문자열의 끝에 자동으로 널 문자가 추가된다.
+
+예제ReadString.c
+#include <stdio.h>
+int main()
+{
+  char str[7];
+  for(int i=0; i<3; i++)
+  {
+    fgets(str, sizeof(str), stdin);
+    printf("Read %d: %s \n", i+1, str);
+  }
+  return 0;
+}
+fgets()는 \n을 만날 때까지 문자열을 읽어들이는데, \n을 제외시키거나 버리지 않고 문자열의 일부로 받아들인다. 엔터 키의 정보도 문자열의 일부로 저장되는 것이다. 공백을 포함하는 형태의 문자열도 입력 가능하다. 참고: scanf()를 통해서는 공백을 포함하는 문자열을 입력 받을 수 없다.
+
+
 */
