@@ -45,5 +45,25 @@ int main()
   return 0;
 }
 
+  -문자 입출력에서 EOF
+EOF(End Of File): 파일의 끝을 표현하기 위해서 정의해 놓은 상수. 
+ex) 파일을 대상으로 fgetc()가 호출되면, 그리고 그 결과로 EOF가 반환되면, '파일의 끝에 도달해서 더 이상 읽을 내용이 없다'는 뜻이 된다.
+fgetc(), getchar() 는 다음 두 가지 중 하나가 만족되었을 때 EOF 반환
+함수 호출의 실패
+Windonws에서 CTRL+Z, Linux에서 CTRL+D 키가 입력되는 경우
 
+예제ConsoleEOF.c
+#include <stdio.h>
+int main()
+{
+  int ch;
+  while(1)
+  {
+    ch=getchar();
+    if(ch==EOF)
+      break;
+    putchar(ch);
+  }
+  return 0;
+}
 */
