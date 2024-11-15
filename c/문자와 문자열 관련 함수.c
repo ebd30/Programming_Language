@@ -16,7 +16,7 @@ stderr 표준 에러 스트림(모니터 대상으로 출력)
 스트림(Stream): 한 방향으로 흐르는 데이터의 흐름. 단방향으로만 데이터의 전송이 이뤄진다는 뜻이 담겨있다. 실제로 입출력 스트림도 입력 스트림과 출력 스트림이 구분되어서 한 방향으로만 데이터의 흐름을 유지하고 있다.
 
 #문자 단위 입출력 함수
-  -putchar, fputc
+  -문자 출력 함수:putchar, fputc
 #include <stdio.h>
 int putchar(int c);
 int fputc(int c, FILE * stream); -> 함수호출 성공 시 쓰여진 문자정보가, 실패 시 EOF 반환
@@ -24,7 +24,7 @@ int fputc(int c, FILE * stream); -> 함수호출 성공 시 쓰여진 문자정�
 putchar(): 인자로 전달된 문자정보를 stdout으로 표현되는 표준 출력 스트림으로 전송하는 함수. 인자로 전달된 문자를 모니터로 출력하는 함수라 할 수 있다.
 fputc(): putchar() 와 동일하다. 단, fputc함수는 문자를 전송할 스트림을 지정할 수 있다. 즉, stdout 뿐 아니라, 파일을 대상으로도 데이터를 전송할 수 있다. 두 번째 매개변수 stream은 문자를 출력할 스트림의 지정에 사용된다.(stdout을 전달하면 putchar() 동일한 함수가 된다.)
 
-  -getchar, fgetc
+  -문자 입력 함수:getchar, fgetc
 #include <stdio.h>
 int getchar(void);
 int fgetc(FILE *stream); -> 파일의 끝에 도달하거나 함수호출 실패 시 EOF 반환
@@ -66,4 +66,26 @@ int main()
   }
   return 0;
 }
+
+  -반환형이 int이고, int형 변수에 문자를 담는 이유는?
+fgetc, getchar 함수를 다시 관찰해보면
+int getchar(void);
+int fgetc(FILE * stream);
+반환되는 것은 1바이트 크기의 문자인데, 반환형이 int다. 
+char를 unsigned char로 처리하는 컴파일러도 존재하는데, 위의 두 함수가 반환하는 값 중 하나인 EOF는 -1로 정의된 상수이다. 따라서 반환형이 char형 이라면, 그리고 char를 unsigned char로 처리하는 컴파일러에 의해서 컴파일이 되었다면, EOF는 반환의 과정에서 엉뚱한 양의 정수로 형 변환이 되버린다.
+어떠한 상황에서도 -1을 인식시킬 수 있는 int형으로 반환형을 정의해 놓은 것이다.
+
+#문자열 단위 입출력 함수
+
+  -문자열 출력 함수:puts, fputs
+#include <stdio.h>
+int puts(const char * s);
+int fputs(cont char * s, FILE * stream); -> 성공 시 음수가 아닌 값을, 실패 시 EOF 반환
+puts(): 출력의 대상이 stdout으로 결정되어 있다.
+fputs(): 두 번째 인자를 통해 출력의 대상을 결정할 수 있다.
+둘 다 첫 번째 인자로 전달되는 주소 값의 문자열을 출력하지만, 출력의 형태에 있어 한 가지 차이점이 있다. puts()는 호출되면 문자열 출력 후 자동으로 개행이 이뤄지고, fputs()는 호출되면 문자열이 출력 후 자동으로 개행이 이뤄지지 않는다.
+
+
+  -문자열 입력 함수:gets, fgets
+#include <stdio.h>
 */
