@@ -1,2 +1,2 @@
-![header](https://capsule-render.vercel.app/api?type=Cwaving)
+![header](https://capsule-render.vercel.app/api?type=CWaving)
 
