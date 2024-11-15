@@ -1,3 +1,1 @@
-#C언어 공부 아자아자!
-c언어 공부 현황
-문자열 관련 함수들을 알아보았다.
+### C Programming Language
