@@ -181,4 +181,105 @@ int main()
 }
 위 예제에서 정의된 ClearLineFromReadBuffer 함수는 입력버퍼를 통째로 비우는 함수가 아니라 \n이 읽혀질 때까지 입력버퍼에 저장된 문자들을 지우는 함수이다.
 
+# 입출력 이외의 문자열 관련 함수
+
+  -문자열의 길이를 반환하는 함수: strlen
+#include <string.h>
+size_t strlen(const char * s); -> 전달된 문자열의 길이를 반환하되, 널 문자는 길이에 포함하지 않는다.
+
+위 함수의 반환형 size_t는 일반적으로 typedef unsigned int size_t; 로 선언돼있다. unsigned int 의 선언을 size_t로 대신할 수 있다.
+
+size_t len;
+unsigned int len; 
+두 선언은 동일하다.
+
+strlen() 함수 호출방법
+int main()
+{
+  char str[]="1234567";
+  printf("%u \n", strlen(str)); // 문자열의 길이 7이 출력된다.
+  ....
+}
+
+strlen 함수의 반환형은 size_t이니, 이 함수의 반환 값을 unsigned int형 변수에 저장하고 서식문자 %u로 출력하는 것이 가능하다. 
+문자열이 아무리 길어도 길이정보는 int형 변수에 저장이 가능하기 때문에 strlen 함수의 반환 값을 int형 변수에 저장하고 서식문자 %d로 출력 가능하다.
+
+fgets 함수호출을 통해 문자열을 입력 받고 같이 딸려 들어오는 \n 문자는 문자열에서 제외시키는 예제를 보자.
+
+예제RemoveBSN.c
+#include <stdio.h>
+#include <string.h>
+
+void RemoveBSN(char str[])
+{
+  int len=strlen(str);
+  str[len-1]=0;
+}
+
+int main()
+{
+  char str[100];
+  printf("문자열 입력: ");
+  fgets(str, sizeof(str), stdin);
+  printf("길이: %d, 내용: %s \n", strlen(str), str);
+
+  RemoveBSN(str);
+  printf("길이: %d, 내용: %s \n", strlen(str), str);
+  return 0;
+}
+RemoveBSN()함수는 문자열의 길이를 계산해서 \n이 저장된 위치에 널 문자의 아스키 코드 값 0을 저장하는 함수이다.
+
+  -문자열을 복사하는 함수들: strcpy, strncpy
+#include <string.h>
+char * strcpy(char * dest, const char * src);
+char * strncpy(char * dest, const char * src, size_t n); -> 복사된 문자열의 주소 값 반환
+
+strcpy() 함수 호출 형태
+int main()
+{
+  char str1[30]="Simple String";
+  char str2[30];
+  strcpy(str2, str1); // str2에 str1 문자열을 복사
+  ....
+}
+
+strncpy() 함수 호출 형태
+int main()
+{
+  char str1[30]="Simple String";
+  char str2[30];
+  strncpy(str2, str1, sizeof(str2));
+  ....
+}
+
+str1에 저장된 문자열을 str2에 복사하고, str1의 길이가 매우 길다면, sizeof(str2)가 반환한 값에 해당하는 문자의 수 만큼만 복사해라는 의미다. 
+
+예제를 통해 주의해야되는 점 설명한다.
+
+예제StringCopyCase.c
+#include <stdio.h>
+#include <string.h>
+int main()
+{
+  char str1[20]="1234567890";
+  char str2[20];
+  char str3[5];
+
+  strcpy(str2, str1);
+  puts(str2);
+
+  strncpy(str3, str1, sizeof(str3));
+  puts(str3);
+
+  strncpy(str3, str1, sizeof(str3)-1);
+  str3[sizeof(str3)-1]=0;
+  puts(str3);
+  return 0;
+}
+
+위 코드에서 strncpy(str3, str1, sizeof(str3)); 코드는 str3에 str1 문자 5개 1,2,3,4,5가 복사되지만 널 문자는 포함되지 않는다는 문제가 있다. 그래서 출력할 때 이상할 수 있다. 널 문자가 존재해야 이전까지 출력할텐데 널문자가 존재하지 않으니 말이다.
+그래서 
+strncpy(str3, str1, sizeof(str3)-1);
+str3[sizeof(str3)-1]=0;
+같이 호출해야 한다. 
 */
