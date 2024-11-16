@@ -279,7 +279,104 @@ int main()
 
 위 코드에서 strncpy(str3, str1, sizeof(str3)); 코드는 str3에 str1 문자 5개 1,2,3,4,5가 복사되지만 널 문자는 포함되지 않는다는 문제가 있다. 그래서 출력할 때 이상할 수 있다. 널 문자가 존재해야 이전까지 출력할텐데 널문자가 존재하지 않으니 말이다.
 그래서 
+
 strncpy(str3, str1, sizeof(str3)-1);
 str3[sizeof(str3)-1]=0;
-같이 호출해야 한다. 
+
+strncpy 함수의 세 번째 인자로 배열의 실제길이보다 하나 작은 값을 전달해서 널 문자가 삽입될 공간을 남겨두고 복사를 진행해야 한다. 배열의 끝에 널 문자를 삽입하여 마무리하는 것으로 선언해야 한다.
+
+  -문자열을 덧붙이는 함수들:strcat, strncat
+#include <string.h>
+char * strcat(char * dest, const char * src);
+char * strncatchar * dest, const char * src, size_t n); -> 덧붙여진 문자열의 주소 값 반환
+
+strcat() 함수 호출 형태
+int main()
+{
+  char str1[30]="First~";
+  char str2[30]="Second";
+  strcat(str1, str2); // str1의 문자열 뒤에 str2 문자열 복사
+  ....
+}
+
+str1: First~\0 
+\0 에서 str2: Second\0가 덧붙임된다. 
+덧붙임된 결과 str1: First~Second\0
+
+이어서 strncat 함수의 호출문이다.
+
+strncat(str1, str2, 8); // str2의 문자열 중 최대 8개를 str1의 뒤에 덧붙여라
+
+strncat()함수는 널 문자를 포함하여 실제로는 총 9개의 문자가 str1에 덧붙여지는데, 이는 strcat()함수와 달리 strncat()함수는 자동으로 널 문자가 삽입해준다는 것을 알 수 있다.
+
+예제StringConcatCase.c
+#include <stdio.h>
+#include <string.h>
+int main()
+{
+  char str1[20]="First~";
+  char str2[20]="Second";
+  char str3[20]="Simple num: ";
+  char str4[20]="1234567890";
+
+  strcat(str1, str2);
+  puts(str1);
+
+  strncat(str3, str4, 7);
+  puts(str3);
+  return 0;
+}
+
+  -문자열을 비교하는 함수들: strcmp, strncmp
+#include <string.h>
+int strcmp(const char * s1, const char * s2);
+int strncmp(const char * s1, const char * s2, size_t n); -> 두 문자열의 내용이 같으면 0, 같지 않으면 0이 아닌 값 반환
+
+먼저 다음 코드가 의미하는 바를 설명하고, 출력 결과도 말해보겠다.
+int main()
+{
+  char str1[]="My String"; // char형 str1 배열변수 선언 "My String" 문자열로 초기화
+  char str2[]="My String"; // char형 str2 배열변수 선언 "My String" 문자열로 초기화
+  if(str1==str2) // str1배열의 주소, str2배열의 주소가 같으면
+    puts("equal"); // "equal" 출력
+  else // str1배열의 주소, str2배열의 주소가 같지 않으면
+    puts("not equal"); // "not equal" 출력
+  return 0;
+}
+따라서 결과는 not equal이 출력될 것이다. 그래서 strcmp(), strncmp() 함수를 별도로 호출해야할 필요가 있다.
+
+두 함수 모두 인자로 전달된 두 문자열의 내용을 비교해 다음의 결과를 반환한다. 단, strncmp함수는 세 번째 인자로 전달된 수의 크기만큼만 문자를 비교한다. strncmp 함수를 호출하면 앞에서부터 시작해서 중간부분까지 부분적으로만 문자열을 비교할 수 있다.
+
+s1이 더 크면 0보다 큰 값 반환
+s2가 더 크면 0보다 작은 값 반환
+s1, s2 내용이 모두 같으면 0 반환
+
+문자열의 크고 작음은 ASCII 코드 값이 기준이다. 
+일반적으로 strcmp 함수를 호출할 때에는 다음 두 가지 사실에만 근거하여 코드를 작성한다. "0이 반환되면 동일한 문자열, 0이 아닌 값이 반환되면 동일하지 않은 문자열" 때문에 언제 음수, 양수가 반환되는지는 그리 중요하게 인식되지 않는다.
+
+예제StringCompCase.c
+#include <stdio.h>
+#include <string.h>
+int main()
+{
+  char str1[20];
+  char str2[20];
+  printf("문자열 입력 1: ");
+  scanf("%s", str1);
+  printf("문자열 입력 2: ");
+  scanf("%s", str2);
+
+  if(!strcmp(str1, str2))
+  {
+    puts("두 문자열은 같습니다.");
+  }
+  else
+  {
+    puts("두 문자열은 동일하지 않습니다.");
+    if(!strncmp(str1, str2, 3)
+      puts("그러나 앞 세 글자는 동일합니다.");
+  }
+  return 0;
+}
+
 */
