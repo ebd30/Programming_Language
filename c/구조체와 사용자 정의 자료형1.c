@@ -123,4 +123,31 @@ struct point // 구조체의 정의
 };
 struct point pos1, pos2, pos3; // 구조체 변수의 선언
 
+  -구조체 변수의 초기화
+int형 변수를 선언과 동시에 초기화할 수 있듯 구조체 변수도 선언과 동시에 초기화할 수 있다. 그리고 초기화 방법은 배열의 초기화와 유사, 동일하다. 즉 멤버의 순서대로 초기화할 대상을 나열하면 된다.
+
+예제InitStructVal.c
+#include <stdio.h>
+struct point
+{
+  int xpos;
+  int ypos;
+};
+
+struct person
+{
+  char name[20];
+  char phoneNum[20];
+  int age;
+};
+
+int main()
+{
+  struct point pos={10, 20};
+  struct person man={"이승기", "010-1212-1212", 21);
+  printf("%d %d \n", pos.xpos, pos.ypos);
+  printf("%s %s %d \n", man.name, man.phoneNum, man.age);
+  return 0;
+}
+
 */
