@@ -123,6 +123,250 @@ typedef struct
 struct person man; // 불가능한 선언이다.
 구조체의 이름이 생략 가능함을 잊지 말자.
 
+#함수로의 구조체 변수 전달과 반환
+
+  -함수의 인자로 전달되고 return문에 의해 반환되는 구조체 변수
+void SimpleFunc(int num){....}
+int main()
+{
+  int age=24;
+  SimpleFunc(age); //age에 저장된 값이 매개변수 num에 전달(복사)
+  ....
+}
+위 코드 실행 시, 인자로 전달되는 변수의 값은 매개변수에 복사가 된다.
+마찬가지로 함수의 인자로 구조체 변수가 전달될 수 있으며, 이러한 인자를 전달받을 수 있도록 구조체 변수가 매개변수의 선언으로 올 수 있다. 그리고 전달되는 구조체 변수의 값은 매개변수에 통째로 복사가 된다.
+
+예제StructValFunction.c
+#include <stdio.h>
+typedef struct point
+{
+  int xpos;
+  int ypos;
+} Point;
+
+void ShowPosition(Point pos)
+{
+  printf("[%d, %d] \n", pos.xpos, pos.ypos);
+}
+
+Point GetCurrentPosition(void)
+{
+  Point cen;
+  printf("Input current pos: ");
+  scanf("%d %d', &cen.xpos, &cen.ypos);
+  return cen;
+}
+
+int main()
+{
+  Point curPos=GetCurrentPosition();
+  ShowPosition(curPos);
+  return 0;
+}
+
+그리고 구조체의 멤버로 배열이 선언되어도 위 예제에서 보인 것과 동일한 형태의 복사가 진행된다. 즉 인자의 전달과정에서 값의 반환과정에서 구조체의 멤버로 선언된 배열도 통째로 복사가 된다.
+예제StructMemArrCopy.c
+#include <stdio.h>
+typedef struct person
+{
+  char name[20];
+  char phoneNum[20];
+  int age;
+} Person;
+
+void ShowPersonInfo(Person man)
+{
+  printf("name: %s \n", man.name);
+  printf("phone: %s \n", man.phoneNum);
+  printf("age: %d \n", man.age);
+}
+
+Person ReadPersonInfo(void)
+{
+  Person man;
+  printf("name? "); scanf("%s", man.name);
+  printf("phone? "); scanf("%s", man.phoneNum);
+  printf("age? "); scanf("%d", &man.age);
+  return man;
+}
+
+int main()
+{
+  Person man=ReadPersonInfo();
+  ShowPersonInfo(man);
+  return 0;
+}
+
+실행결과는 인자의 전달과정에서, 그리고 값의 반환과정에서 구조체의 멤버로 선언된 배열도 통째로 복사됨을 보이고 있다.
+
+예제StructFunctionCallByRef.c
+#include <stdio.h>
+typedef struct point
+{
+  int xpos;
+  int ypos;
+} Point;
+
+void OrgSymTrans(Point * ptr)
+{
+  ptr->xpos = (ptr->xpos) * -1;
+  ptr->ypos = (ptr->xpos) * -1;
+}
+
+void ShowPosition(Point pos)
+{
+  printf("[%d, %d] \n", pos.xpos, pos.ypos);
+}
+
+int main()
+{
+  Point pos={7, 5};
+  OrgSymTrans(&pos);
+  ShowPosition(pos);
+  OrgSymTrans(&pos);
+  ShowPosition(pos);
+  return 0;
+}
+
+위 예제 OrgSymTrans()함수에서 보이는 바와 같이 구조체의 포인터 변수도 매개변수로 선언이 되어서 Call-by-reference 형태의 함수호출을 구성할 수 있다.
+
+  -구조체 변수를 대상으로 가능한 연산
+구조체 변수를 대상으로는 제한된 형태의 연산만 허용이 된다. 허용되는 가장 대표적인 연산은 대입연산이며, 그 이외로 주소 값 반환을 목적으로 하는 &연산이나 구조체 변수의 크기를 반환하는 sizeof() 정도의 연산만 허용이 된다.
+예제StructOperation.c
+#include <stdio.h>
+typedef struct point
+{
+  int xpos;
+  int ypos;
+} Point;
+
+int main()
+{
+  Point pos1={1, 2};
+  Point pos2;
+  pos2=pos1; // pos1의 멤버 대 pos2의 멤버간 복사가 진행됨
+
+  printf("크기: %d \n", sizeof(pos1)); // pos1의 전체 크기 반환
+  printf("[%d, %d] \n", pos1.xpos, pos1.ypos);
+  printf("크기: %d \n", sizeof(pos2)); // pos2의 전체 크기 반환
+  printf("[%d, %d] \n", pos2.xpos, pos2.ypos);
+  return 0;
+}
+구조체 변수간 대입연산의 결과로 멤버 대 멤버의 복사가 이뤄짐을 확인할 수 있다.
+
+위 예제에서 정의한 Point 구조체만 놓고 보면 구조체 변수를 대상으로도 덧셈,뺄셈이 가능할 것처럼 보이지만 구조체 안에는 배열,포인터 변수도 또한 다른 구조체의 변수도 존재할 수 있다. 따라서 구조체 변수 대상의 덧셈과 뺄셈연산의 결과를 정형화하는 데는 무리가 있다.
+구조체 변수를 덧셈이나 뺄셈을 하려면 함수를 직접 정의해야 한다.
+예제StructAddMin.c
+#include <stdio.h>
+typedef struct point
+{
+  int xpos;
+  int ypos;
+} Point;
+
+Point AddPoint(Point pos1, Point pos2)
+{
+  Point pos={pos1.xpos+pos2.xpos, pos1.ypos+pos2.ypos};
+  return pos;
+}
+
+Point MinPoint(Point pos1, Point pos2)
+{
+  Point pos={pos1.xpos-pos2.xpos, pos1.ypos-pos2.ypos};
+  return pos;
+}
+
+int main()
+{
+  Point pos1={5, 6};
+  Point pos2={2, 9};
+  Point result;
+  result = AddPoint(pos1, pos2);
+  printf("[%d, %d] \n", result.xpos, result.ypos);
+  result = MinPoint(pos1, pos2);
+  printf("[%d, %d] \n", result.xpos, result.ypos);
+  return 0;
+}
+
+
+#구조체의 유용함에 대한 논의와 중첩 구조체
+
+  -구조체를 정의하는 이유
+구조체를 통해서 연관 있는 데이터를 하나로 묶을 수 있는 자료형을 정의하면, 데이터의 표현 및 관리가 용이해지고, 그만큼 합리적인 코드를 작성할 수 있게 된다.
+예제StructImportant.c
+#include <stdio.h>
+typedef struct student
+{
+  char name[20]; // 학생 이름
+  char stdnum[20]; // 학생 고유번호
+  char school[20]; // 학교 이름
+  char major[20]; // 선택 전공
+  int year; // 학년
+} Student;
+
+void ShowStudentInfo(Student * sptr)
+{
+  printf("학생 이름: %s \n", sptr->name);
+  printf("학생 고유번호: %s \n", sptr->stdnum);
+  printf("학교 이름: %s \n", sptr->school);
+  printf("선택 전공: %s \n", sptr->major);
+  printf("학년: %d \n", sptr->year);
+}
+
+int main()
+{
+  Student arr[7];
+
+  for(int i=0; i<7; i++)
+  {
+    printf("이름: "); scanf("%s", arr[i].name);
+    printf("번호: "); scanf("%s", arr[i].stdnum);
+    printf("학교: "); scanf("%s", arr[i].school);
+    printf("전공: "); scanf("%s", arr[i].major;
+    printf("학년: "); scanf("%d", &arr[i].year);
+  }
+
+  for(int i=0; i<7; i++);
+    ShowStudentInfo(&arr[i]);
+  return 0;
+}
+
+구조체를 정의하지 않고 위 예제와 동일한 코드를 작성하기 어려울 것이다. 하나의 배열에 모든 데이터를 저장할 수 없게 되고, 때문에 다수의 배열이 필요하게 된다. 출력할 데이터의 종류만큼 매개변수가 선언되어야 하기 때문이다.
+
+  -중첩된 구조체의 정의와 변수의 선언
+구조체 안에 구조체 변수가 멤버로 존재하는 경우를 가리켜 '구조체의 중첩'이라 한다.
+예제CircleIncludePoint.c
+#include <stdio.h>
+typedef struct point 
+{
+  int xpos;
+  int ypos;
+} Point;
+
+typedef struct circle
+{
+  Point cen;
+  double rad;
+} Circle;
+
+void ShowCircleInfo(Circle * cptr)
+{
+  printf("[%d, %d] \n", (cptr->cen).xpos, (cptr->cen).ypos);
+  printf("radius: %g \n\n", cptr->rad);
+}
+
+int main()
+{
+  Circle c1={{1, 2}, 3.5};
+  Circle c2={{2, 4, 3.9};
+  ShowCircleInfo(&c1);
+  ShowCircleInfo(&c2);
+  return 0;
+}
+참고로 구조체 변수를 초기화하는 경우에도 배열의 초기화와 마찬가지로 초가화하지 않은 일부 멤버에 대해서는 0으로 초기화가 진행된다.
+
+
+
 
 
 */
