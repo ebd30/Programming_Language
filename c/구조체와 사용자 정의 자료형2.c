@@ -493,7 +493,7 @@ int main()
 
 buf
 |  1byte  || 1byte   || 1byte   || 1byte   |
-< bBuf[0] >< bBuf[0] >< bBuf[0] >< bBuf[0] >
+< bBuf[0] >< bBuf[1] >< bBuf[2] >< bBuf[3] >
 <-----sBuf.upper-----><-----sBuf.lower----->
 <-------------------iBuf------------------->
 
