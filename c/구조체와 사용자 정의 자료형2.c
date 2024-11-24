@@ -366,6 +366,144 @@ int main()
 참고로 구조체 변수를 초기화하는 경우에도 배열의 초기화와 마찬가지로 초가화하지 않은 일부 멤버에 대해서는 0으로 초기화가 진행된다.
 
 
+#공용체(Unidon Type)의 정의와 의미
+
+  -struct구조체 VS union공용체
+동일한 구성의 멤버를 이용해 구조체, 공용체를 각각 정의해 보겠다.
+typedef struct sbox // 구조체 sbox 정의
+{
+  int mem1;
+  int mem2;
+  double mem3;
+} SBox;
+
+typedef union ubox // 공용체 ubox 정의
+{
+  int mem1;
+  int mem2;
+  double mem3;
+} UBox;
+정의방식에서 유일한 차이는 struct 선언을 하냐, union 선언을 하냐에 있다. 하지만 각가의 변수가 메모리 공간에 할당되는 방식과 접근의 결과에는 많은 차이가 있다.
+
+printf("%d \n", sizeof(SBox)); // 16, 모든 멤버의 크기를 합한 결과
+printf("%d \n", sizeof(UBox)); // 8, 멤버 중 가장 크기가 큰 double의 크기만 계산된 결과
+
+예제UnionMemAlloc.c
+#include <stdio.h>
+typedef struct sbox // 구조체 sbox 정의
+{
+  int mem1;
+  int mem2;
+  double mem3;
+} SBox;
+
+typedef union ubox // 공용체 ubox 정의
+{
+  int mem1;
+  int mem2;
+  double mem3;
+} UBox;
+
+int main()
+{
+  SBox sbx;
+  UBox ubx;
+  printf("%p %p %p \n", &sbx.mem1, &sbx.mem2, &sbx.mem3);
+  printf("%p %p %p \n", &ubx.mem1, &ubx.mem2, &ubx.mem3);
+  printf("%d %d \n", sizeof(SBox), sizeof(Ubox));
+  return 0;
+}
+실행결과에서 가장 주목할 부분은 UBox형 변수를 구성하는 멤버 mem1, mem2, mem3의 주소 값이 동일하다는 것이다.
+
+구조체 변수
+int mem1----
+int mem2----
+double mem3--------
+
+공용체 변수
+----double----
+<-mem1->
+<-mem2->
+<----mem3---->
+
+구조체 변수가 선언되면, 구조체를 구성하는 멤버는 각각 할당이 된다. 반면 공용체 변수가 선언되면, 공용체를 구성하는 멤버는 각각 할당되지 않고 크기가 가장 큰 멤버의 변수만 하나 할당되어 이를 공유한다. 
+예제UnionValAccess.c
+#include <stdio.h>
+typedef union ubox // 공용체 ubox 정의
+{
+  int mem1;
+  int mem2;
+  double mem3;
+} UBox;
+
+int main()
+{
+  UBox ubx; // 8byte allocation
+  ubx.mem1=20;
+  printf("%d \n", ubx.mem2);
+
+  ubx.mem3=7.15;
+  printf("%d \n", ubx.mem1);
+  printf("%d \n", ubx.mem2);
+  printf("%d \n", ubx.mem3);
+  return 0;
+}
+
+  -공용체의 유용함은 다양한 접근방식을 제공하는데 있습니다
+공용체의 유용함은 간단히 설명되지 않는데 결과적으로는 '하나의 메모리 공간을 둘 이상의 방식으로 접근할 수 있다.'는 것으로 정리가 되지만, 유용하게 사용이 되는 상황은 분야별로 차이가 있기 때문이다.
+
+공용체의 유용함을 이해할 수 있는 상황 연출
+민선:수진아 교수님이 과제 내줬어
+수진: 뭔 과제?
+
+민선: 프로그램 사용자로부터 int형 정수 하나를 입력 받으래
+수진: 그리고?
+
+민선: 입력 받은 정수 상위 2byte, 하위 2byte 값을 양으로 출력하고, 그 다음엔 상위 1byte, 하위 1byte에 저장된 값의 아스키 문자 출력하래
+수진: 흠... 아마도 공용체 이용하라는 과제같아.
+
+예제UsefulUnionAccess.c
+#include <stdio.h>
+typedef struct dbshort
+{
+  unsigned short upper;
+  unsigned short lower;
+} DBShort;
+
+typedef union rdbuf
+{
+  int iBuf;
+  char bBuf[4];
+  DBShort sBuf;
+} RDBuf;
+
+int main()
+{
+  RDBuf buf;
+  printf("정수 입력: ");
+  scanf("%d", &(buf.iBuf));
+  printf("상위 2byte: %u \n", buf.sBuf.upper);
+  printf("하위 2byte: %u \n", buf.sBuf.lower);
+  printf("상위 1byte ascii code: %c \n", buf.bBuf[0]);
+  printf("하위 1byte ascii code: %c \n", buf.bBuf[3]);
+  return 0;
+}
+
+공용체 변수는 메모리 공간에 다음의 형태로 할당되고 공유된다.
+
+buf
+|  1byte  || 1byte   || 1byte   || 1byte   |
+< bBuf[0] >< bBuf[0] >< bBuf[0] >< bBuf[0] >
+<-----sBuf.upper-----><-----sBuf.lower----->
+<-------------------iBuf------------------->
+
+
+#열거형(
+
+
+
+
+
 
 
 
