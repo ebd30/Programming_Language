@@ -515,7 +515,73 @@ Do를 정수 1을 의미하는 상수로 정의한다. 그리고 이 값은 syll
 즉, 위 열거형 정의에서 Do, Re, Mi, Fa, So, La, Ti라는 이름의 상수를 각각 1, 2, 3, 4, 5, 6, 7로 정의하고, syllable형 변수가 저장할 수 있는 값들로 제한한 것이다.
 
 예제EnumTypeTone.c
+#include <stdio.h>
+typedef enum syllable
+{
+  Do=1, Re=2, Mi=3, Fa=4, So=5, La=6, Ti=7
+} Syllable;
 
+void Sound(Syllable sy)
+{
+  switch(sy)
+  {
+    case Do:
+      puts("도는 하얀 도라지"); return;
+    case Re:
+      puts("레는 둥근 레코드"); return;
+    case Mi:
+      puts("미는 파란 미나리"); return;
+    case Fa:
+      puts("파는 예쁜 파랑새"); return;
+    case So:
+      puts("솔은 작은 솔방울"); return;
+    case La:
+      puts("라는 라디오고요"); return;
+    case Ti:
+      puts("시는 졸졸 시냇물"); return;
+  }
+  puts("다 함께 부르세 도레미파 솔라시도~");
+}
+
+int main()
+{
+  Syllable tone;
+  for(tone=Do; tone<=Ti; tone+=1)
+    Sound(tone);
+  return 0;
+}
+
+위 예제 반복문에서 Do와 Ti는 각각 1~7을 의미하는 상수이니, 이 반복문을 다음의 반복문으로 대신해도 그 결과는 동일하다.
+for(tone=1; tone<=7; tone+=1)
+  Sound(tone);
+
+위 예제 case 레이블에 사용된 상수, Do, Re... 를 대신해 1,2..를 삽입해도 결과는 동일하다. 열거형 상수(Enumeration constants)들은 int 형으로 표현되는 상수이기 때문이다. 
+따라서 int형 데이터가 올 수 있는 위치에는 열거형 상수가 올 수 있다.
+
+  -열거형 상수의 값이 결정되는 방식
+enum color {RED, BLUE, WHITE, BLACK}; // 열거형 상수의 이름만 선언되었을 뿐이다.
+위 경우 열거형 상수의 값은 0에서부터 시작해 1씩 증가하는 형태로 결정이된다. 
+
+enum color {RED, BLUE, WHITE, BLACK};
+enum color {RED=0, BLUE=1, WHITE=2, BLACK=3};
+즉 둘의 정의는 동일하다.
+
+enum color {RED=3, BLUE, WHITE=6, BLACK};
+위 정의는 열거형 상수 BLUE, BLACK 값이 선언되어 있지 않다. 값이 선언되지 않으면 앞서 선언된 상수보다 1이 증가된 값이 할당된다.
+
+enum color {RED=3, BLUE, WHITE=6, BLACK};
+enum color {RED=3, BLUE=4, WHITE=6, BLACK=7};
+즉 둘의 정의는 동일하다.
+
+  -열거형의 유용함은 이름있는 상수의 정의를 통한 의미의 부여에 있습니다.
+열거형은 구조체 및 공용체와 정의하는 방식이 유사함에도 정의하는 목적에서 큰 차이가 있다.
+구조체, 공용체는 자료형의 정의에 의미가 있다. 변수를 선언하기 위해 자료형을 정의하는 것이다.
+열거형도 정의하고 나면 해당 열거형의 변수 선언이 가능하지만 일반적으로 연관이 있는 이름을 동시에 상수로 선언하기 위해 열거형을 정의한다.
+열거형의 유용함은 둘 이상의 연관이 있는 이름을 상수로 선언함으로써 프로그램의 가독성을 높이는 데 있다.
+따라서 다음과 같이 자료형의 이름을 생량한 형태로 열거형을 정의할 수도 있다.
+
+enum {Do=1, Re=2, Mi=3, Fa=4, So=5, La=6, Ti=7};
+위와 같이 정의되어도 열거형 상수들은 상수로써 의미를 지닌다.
 
 
 
