@@ -301,6 +301,69 @@ int main()
 }
 fgets함수는 파일의 끝에 도달해서 더 이상 읽을 데이터가 존재하지 않거나 오류가 발생하는 경우 NULL을 반환한다. 때문에 위 예제세어 파일복사의 성공을 확인하기 위해 feof함수를 호출했다.
 
+  -바이너리 데이터의 입출력: fread, fwrite
+#include <stdio.h>
+size_t fread(void * buffer, size_t size, size_t count, FILE * stream);
+-> 성공 시 전달인자 count, 실패 또는 파일의 끝 도달 시 count보다 작은 값 반환
+
+fread함수는 다음과 같이 호출된다.
+int buf[12];
+fread((void*)buf, sizeof(int), 12, fp); // fp는 FILE 구조체 포인터
+sizeof(int)크기의 데이터 12개를 fp로부터 읽어들여서 배열 buf에 저장하라는 의미다. fread함수는 두 번째 전달인자와 세 번째 전달인자의 곱의 바이트 크기만큼 데이터를 읽어 들이는 함수다. 
+
+#include <stdio.h>
+size_t fwrite(const void * buffer, size_t size, size_t count, FILE * stream);
+-> 성공 시 전달인자 count, 실패 시 count보다 작은 값 반환
+
+fwrite함수는 다음과 같이 호출된다.
+int buf[7]={1,2,3,4,5,6,7,};
+fwrite((void*)buf, sizeof(int), 7, fp);
+sizeof(int)크기의 데이터 7개를 buf로부터 읽어서 fp에 저장하라는 의미다.
+
+예제BinaryFileCopy.c
+#include <stdio.h>
+int main()
+{
+  FILE * src = fopen("src.bin", "rb");
+  FILE * des = fopen("dst.bin", "wb");
+  char buf[20];
+  int readCnt;
+
+  if(src==NULL || des==NULL) {
+    puts("파일 열기 실패!");
+    return -1;
+  }
+
+  while(1)
+  {
+    readCnt=fread((void*)buf, 1, sizeof(buf), src);
+
+    if(readCnt<sizeof(buf))
+    {
+      if(feof(src)!=0)
+      {
+        fwrite((void*)buf, 1, readCnt, des);
+        puts("파일 복사 완료!");
+        break;
+      }
+      else
+        puts("파일 복사 실패!");
+    }
+    fwrite((void*)buf, 1, sizeof(buf), des);
+  }
+
+  fclose(src);
+  fclose(des);
+  
+  return 0;
+}
+
+위 예제는 복사 프로그램이다. 
+복사 프로그램은 다음의 성격을 지닌다.
+READ/WRITE 동시에 진행해야 한다.
+파일의 끝에 도달했는지를 확인해야 한다.
+
+
 
 
 
