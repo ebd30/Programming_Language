@@ -191,6 +191,118 @@ w+t나 wt+는 같은 의미이다. 나머지 개방 모드도 비슷하다.
 #파일 입출력 함수의 기본
 
 
+  -Chapter 21에서 학습한 파일 입출력 함수들
+int fputc(int c, FILE * stream); // 문자 출력
+int fgetc(FILE * stream); // 문자 입력
+int fputs(const char * s, FILE * stream); // 문자열 출력
+char * fgets(char *s, int n, FILE * stream); // 문자열 입력
+
+예제TextDataFileWrite.c
+#include <stdio.h>
+int main()
+{
+  FILE * fp=fopen("simple.txt", "wt");
+  if(fp == NULL) {
+    puts("파일 열기 실패!");
+    return -1;
+  }
+
+  fputc('A', fp);
+  fputc('B', fp);
+  fputs("My name is cong \n", fp);
+  fputs("Your name is bob \n", fp);
+  fclose(fp);
+  
+  return 0;
+}
+위 예제는 문자와 문자열을 출력하고 있으며, 문자열 안에는 개행문자도 포함되어 있다. 따라서 반드시 텍스트 모드로 파일을 개방해야 한다.
+
+예제TextDataFileRead.c
+#include <stdio.h>
+int main()
+{
+  char str[30];
+  int ch;
+  FILE * fp=fopen("simple.txt", "rt");
+  
+  if(fp == NULL) {
+    puts("파일 열기 실패!");
+    return -1;
+  }
+  
+  ch=fgetc(fp);
+  printf("%c\n", ch);
+  ch=fgetc(fp);
+  printf("%c\n", ch);
+  ch=fgets(str, sizeof(str), fp);
+  printf("%s \n", str);
+  ch=fgets(str, sizeof(str), fp);
+  printf("%s \n", str);
+  fclose(fp);
+  
+  return 0;
+}
+
+  -feof 함수 기반의 파일복사 프로그램
+#include <stdio.h>
+int feof(FILE * stream);
+-> 파일의 끝에 도달한 경우 0이 아닌 값 반환
+
+feof() 함수는 인자로 전달된 FILE 구조체의 포인터를 대상으로 더 이상 읽어들일 데이터가 존재하지 않으면(파일의 끝까지 모두 읽어들인 상태면) 0이 아닌 값을 반환한다. 파일의 끝을 확인해야 하는 경우에 유용하게 사용된다.
+예제TextCharFileCopy.c
+#include <stdio.h>
+int main()
+{
+  FILE * src = fopen("src.txt", "rt");
+  FILE * des = fopen("dst.txt", "wt");
+  int ch;
+
+  if(src == NULL || des == NULL) {
+    puts("파일 열기 실패!");
+    return -1;
+  }
+  while((ch=fgetc(src)) != EOF)
+    fputc(ch, des);
+
+  if(feof(src)!=0)
+    puts("파일복사 완료!");
+  else
+    puts("파일복사 실패!");
+
+  fclose(src);
+  fclose(des);
+  
+  return 0;
+}
+
+예제TextStringFileCopy.c
+#include <stdio.h>
+int main()
+{
+  char str[20];
+  FILE * src = fopen("src.txt", "rt");
+  FILE * des = fopen("des.txt", "wt");
+  if(src == NULL || des == NULL) {
+    puts("파일 열기 실패!");
+    return -1;
+  }
+  while((str=fgets(str, sizeof(str), src)) != NULL)
+    fputs(str, des);
+
+  if(feof(src)!=0)
+    puts("파일 복사 완료!");
+  else
+    puts("파일 복사 실패!");
+
+  fclose(src);
+  fclose(des);
+
+  return 0;
+}
+fgets함수는 파일의 끝에 도달해서 더 이상 읽을 데이터가 존재하지 않거나 오류가 발생하는 경우 NULL을 반환한다. 때문에 위 예제세어 파일복사으 ㅣ성공을 확인하기 위해 feof함수를 호출했다.
+
+
+
 
 
 
