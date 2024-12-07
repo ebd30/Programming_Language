@@ -411,7 +411,7 @@ int main()
   char name[10];
   char sex;
   int age, ret;
-  FILE * fp=fopen("friend.txt" "rd");
+  FILE * fp=fopen("friend.txt" "rt");
   while(1)
   {
     ret=fscanf(fp, "%s %c %d", name, &sex, &age);
