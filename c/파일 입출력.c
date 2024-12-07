@@ -364,6 +364,42 @@ READ/WRITE 동시에 진행해야 한다.
 파일의 끝에 도달했는지를 확인해야 한다.
 
 
+#텍스트 데이터와 바이너리 데이터를 동시에 입출력하기
+
+  -서식에 따른 데이터 입출력: fprintf, fscanf
+이 두 함수는 printf, scanf 함수와 유사하지만 입출력의 대상이 콘솔이 아닌 파일이라는 점에서 차이가 있다.
+
+fprintf 함수의 호출방법
+char name[10]="권소련"; // text data
+char sex='M'; // text data: man M, woman F.
+int age=24; // binary data
+fprintf(fp, "%s, %c, %d", name, sex, age); // fp는 FILE 구조체 포인터
+
+printf함수의 호출문과 차이를 보이는 부분은 FILE 구조체의 포인터가 첫 번째 전달인자라는 점이다. 결국 텍스트 데이터와 바이너리 데이터를 하나의 문자열로 묶어서 저장하는 셈이다.
+예제ComplexFileWrite.c
+#include <stdio.h>
+int main()
+{
+  char name[10];
+  char sex;
+  int age;
+
+  FILE * fp=fopen("friend.txt", "wt");
+  for(int i=0; i<3; i++)
+  {
+    printf("이름 성별 나이 순 입력: ");
+    scanf("%s %c %d", name, &sex, &age);
+    getchar(); // 버퍼에 남아있는 \n의 소멸을 위해서
+    fprintf(fp, "%s %c %d", name, sex, age);
+  }
+  fclose(fp);
+  
+  return 0;
+}
+
+fscanf 함수의 호출방식
+  
+
 
 
 
