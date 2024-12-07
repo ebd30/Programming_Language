@@ -398,7 +398,32 @@ int main()
 }
 
 fscanf 함수의 호출방식
+char name[10];
+char sex;
+int age;
+fscanf(fp, "%s %c %d", name, &sex, &age);
+
+scanf함수 호출문과 차이를 보이는 부분은 첫 번째 인자로 FILE 구조체의 포인터가 전달된다는 점이다. 그리고 fscanf함수는 파일의 끝에 도달하거나 오류가 발생하면 EOF를 반환한다.
+예제ComplexFileRead.c
+#include <stdio.h>
+int main()
+{
+  char name[10];
+  char sex;
+  int age, ret;
+  FILE * fp=fopen("friend.txt" "rd");
+  while(1)
+  {
+    ret=fscanf(fp, "%s %c %d", name, &sex, &age);
+    if(ret==EOF)
+      break;
+    printf("%s %c %d \n", name, sex, age);
+  }
   
+  fclose(fp);
+  
+  return 0;
+}
 
 
 
