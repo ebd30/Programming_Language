@@ -425,7 +425,47 @@ int main()
   return 0;
 }
 
+  -텍스트와 바이너리 데이터의 집합체인 구조체 변수의 입출력
+프로그램에서는 데이터들을 구조체로 묶어서 정의하는 것이 보통이다. 
+typedef struct friend
+{
+  char name[10];
+  char sex;
+  int age;
+} Friend;
 
+구조체 변수 단위의 입출력이 구조체 멤버 단위의 입출력보다 입출력의 형태가 단순해질 수 밖에 없다. 구조체 변수를 하나의 바이너리 데이터로 인식하고 처리하면 구조체 변수를 통째로 저장하고 통째로 읽어들일 수 있다.
+
+예제StructFileWriteRead.c
+#include <stdio.h>
+
+typedef struct friend
+{
+  char name[10];
+  char sex;
+  int age;
+} Friend;
+
+int main()
+{
+  FILE * fp;
+  Friend myfriend1;
+  Friend myfriend2;
+
+  // file write 
+  fp=fopen("friend.bin", "wb");
+  printf("이름, 성별, 나이 순 입력: "); scanf("%s %c %d", name, &sex, &age);
+  fwrite((void*)&myfriend1, sizeof(myfriend1), 1, fp);
+  fclose(fp);
+
+  // file read
+  fp=fopen("friend.bin", "rb");
+  fread((void*)&myfriend2, sizeof(myfriend2), 1, fp);
+  printf("%s %c %d \n", myfriend2.name, myfriend2.sex, myfriend2.age);
+  fclose(fp);
+  
+  return 0;
+}
 
 
 
