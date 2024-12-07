@@ -475,7 +475,59 @@ FILE 구조체의 멤버 중에는 파일의 위치 정보를 저장하고 있�
 예를 들어 fgets 함수호출을 통해서 파일에 저장된 문자열을 읽어 들이는 경우, 이 멤버가 가리키는 위치를 시작으로 문자열을 읽어들이게 되며, 총 20바이트 크기의 문자열이 읽혀졌다고 가정하면, 이 멤버는 20바이트 뒤를 가리키게 된다.
 이처럼 이 멤버에 저장된 위치 정보의 갱신을 통해 데이터를 읽고 쓸 위치 정보가 유지되는 것이다. 따라서 이 멤버를 가리켜 '파일 위치 지시자' 라 부르기로 약속했다.
 
-  -
+  -파일 위치 지시자의 이동: fseek
+#include <stdio.h>
+int fseek(FILE * stream, long offset, int wherefrom);
+-> 성공 시 0, 실패 시 0이 아닌 값을 반환
+
+파일 위치 지시자를 직접 이동시키고자 할 때 fseek() 함수를 호출해야 한다.
+함수는 세 개의 인자를 요구하는데 인자가 의미하는 바는 'stream으로 전달된 파일 위치 지시자를 wherefrom에서부터 offset 바이트만큼 이동시켜라'다.
+
+wherefrom에 전달도리 수 있는 상수와 의미
+매개변수 wherefrom 이 - 파일 위치 지시자는...
+SEEK_SET(0)이라면 - 파일 맨 앞에서부터 이동을 시작
+SEEK_CUR(1)이라면 - 현재 위치에서부터 이동을 시작
+SEEK_END(2)이라면 - 파일 맨 끝에서부터 이동을 시작
+
+매개변수 offset에는 양의 정수뿐만 아니라 음의 정수도 전달될 수 있다. 양의 정수가 전달되면 파일의 마지막을 향해 파일 위치 지시자가 이동하지만, 음의 정수가 전달되면 파일의 시작 위치를 향해 파일 위치 지시자가 이동을 한다.
+fseek 함수의 호출 시 언급하고자 하는 사항
+SEEK_SET 전달 시 첫 번째 바이트에서부터 이동을 시작한다.
+SEEK_END 전달 시 EOF 에서부터 이동을 시작한다.
+fseek 함수의 두 번째 인자로 음수가 전달되면 왼쪽으로(앞 부분으로) 이동을 한다.
+
+일반적으로 SEEK_END가 전달되면 파일의 끝에서부터 이동이 시작된다 했는데 여기서 말하는 파일의 끝은 파일의 마지막 데이터가 아닌, 파일의 끝을 표시하기 위해 삽입이 되는 EOF를 의미함에 주의해야 한다.
+
+예제MoveFileReWrPos.c
+#include <stdio.h>
+int main()
+{
+  //file create
+  FILE * fp=fopen("text.txt", "wt");
+  fputs("123456789", fp);
+  fclose(fp);
+
+  //file open
+  fp=fopen("text.txt", "rt");
+
+  //SEEK_END test
+  fseek(fp, -2, SEEK_END);
+  putchar(fgetc(fp);
+
+  //SEEK_SET test
+  fseek(fp, 2, SEEK_SET);
+  putchar(fgetc(fp));
+
+  //SEEK_CUR test
+  fseek(fp, 2, SEEK_CUR);
+  putchar(fgetc(fp));
+
+  fclose(fp);
+  
+  return 0;
+}
+
+
+
 
 
 
