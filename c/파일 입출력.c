@@ -526,20 +526,41 @@ int main()
   return 0;
 }
 
+  -현재 파일 위치 지시자의 위치는?: ftell
+#include <stdio.h>
+long ftell(FILE * stream);
+-> 파일 위치 지시자의 위치 정보 반환
 
+현재의 파일 위치 지시자 정보를 확인하고 싶다면 ftell() 함수를 호출하면 된다.
+파일 위치 지시자가 첫 번째 바이트를 가리킬 경우 0을 반환하고, 세 번째 바이트를 가리킬 경우 2를 반환한다. 이처럼 가장 앞 부분의 바이트 위치를 0으로 간주한다는 점에 주의해야 한다.
 
+예제TellFileReWrPos.c
+#include <stdio.h>
+int main()
+{
+  long fpos;
 
+  //file create
+  FILE * fp=fopen("text.txt", "wt");
+  fputs("1234-", fp);
+  fclose(fp);
 
+  //file open
+  fp=fopen("text.txt", "rt");
 
-
-
-
-
-
-
+  for(int i=0; i<4; i++)
+  {
+    putchar(fgetc(fp));
+    fpos=ftell(fp);
+    fseek(fp, -1, SEEK_END);
+    putchar(fgetc(fp));
+    fseek(fp, fpos, SEEK_SET);
+  }
+  fclose(fp);
   
-  
-
+  return 0;
+}
+ftell 함수는 파일 위치 지시자의 정보를 임시롤 저장할 때 유용하게 사용된다.
 
 
 */
