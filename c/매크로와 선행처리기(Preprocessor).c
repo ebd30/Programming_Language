@@ -35,6 +35,14 @@ int main(void)                          int main(void)
 #대표적인 선행처리 명령문
 
 
+  -#define: Object-like macro
+#define PI 3.1415 <- 선행처리 명령문의 구성
+
+#define: 지시자,  PI: 매크로,  3.1415: 매크로 몸체
+
+
+
+
 
 
 
