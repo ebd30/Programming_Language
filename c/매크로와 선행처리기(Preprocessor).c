@@ -229,11 +229,102 @@ printf("두 값의 차: %d \n", ((x)>(y)  ?  (x)-(y)  :  (y)-(x)));
 #조건부 컴파일(Conditional Compilation)을 위한 매크로
 
 
+  -if... #endif: 참이라면
+if문이 조건부 실행을 위한 것이라면, #if...#endif는 조건부 코드 삽입을 위한 지시자이다.
+예제if_endif.c
+#include <stdio.h>
+#define ADD 1
+#define MIN 0
 
+int main()
+{
+  int num1, num2;
+  printf("두 개의 정수 입력: ");
+  scanf("%d %d", &num1, &num2);
 
+#if ADD // ADD가 참이라면
+  printf("%d + %d = %d \n", num1, num2, num1+num2);
+#endif
 
+#if MIN // MIN이 참이라면
+  printf("%d - %d = %d\n", num1, num2, num1-num2);
+#endif
 
+  return 0;
+}
 
+  -#ifdef...#endif: 정의되었다면
+#if는 매크로가 참이냐 거짓이냐를 기준으로 동작한다면, #ifdef는 매크로가 정의되었느냐, 정의되지 않았느냐를 기준으로 동작한다.
+예제ifdef_endif.c
+#include <stdio.h>
+//  #define ADD 1
+#define MIN 0
+
+int main()
+{
+  int num1, num2;
+  printf("두 개의 정수 입력: ");
+  scanf("%d %d", &num1, &num2);
+
+#ifdef ADD // 매크로 ADD가 정의되었다면
+  printf("%d + %d = %d \n", num1, num2, num1+num2);
+#endif
+
+#ifdef MIN // 매크로 MIN가 정의되었다면
+  printf("%d - %d = %d\n", num1, num2, num1-num2);
+#endif
+
+  return 0;
+}
+
+매크로의 값은 중요하지 않기 때문에, 다음과 같이 매크로의 몸체를 생략해서 정의해도 된다.
+#define ADD
+#define MIN
+
+그리고 이렇게 매크로가 정의되면 소스코드에 있는 ADD와 MIN은 선행처리 과정에서 공백으로 대체된다.(그냥 소멸된다)
+
+  -#ifndef... #endif: 정의되지 않았다면
+#ifdef문은 '매크로...이 정의되어 있다면'의 의미를 지니는 반면 #ifndef문은 '매크로 ...이 정의되어 있지 않다면'의 의미를 지닌다.
+참고로 #ifndef의 중간에 있는 n은 not을 의미한다.
+
+참고 #ifndef...#endif
+이 매크로는 헤더파일의 중복포함을 막기 위해 주로 사용된다. 따라서 헤더파일의 디자인과 이야기할 때 사용되는 것을 보게 될 것이다.
+
+  -#else의 삽입: #if, #ifdef, #ifndef에 해당
+if문에 else를 추가할 수 있듯이 #if, #ifdef, #ifndef문에도 #else문을 추가할 수 있다. 
+예제else_endif.c
+#include <stdio.h>
+#define HIT_NUM 5
+
+int main()
+{
+#if HIT_NUM==5
+  puts("매크로 상수 HIT_NUM은 현재 5입니다.");
+#else
+  puts("매크로 상수 HIT_NUM은 현재 5가 아닙니다.");
+#endif
+
+  return 0;
+}
+
+  -#elif의 삽입: #if에만 해당
+if문에 else if를 여러 번 추가할 수 있듯이 #if문에도 #elif를 여러 번 추가할 수 있다. 그리고 else if의 끝을 else로 마무리 할 수 있듯이, #elif의 끝을 #else로 마무리할 수 있다.
+예제elif_endif.c
+#include <stdio.h>
+#define HIT_NUM 7
+int main()
+{
+#if HIT_NUM==5
+  puts("매크로 상수 HIT_NUM은 현재 5입니다.");
+#elif HIT_NUM==6
+  puts("매크로 상수 HIT_NUM은 현재 6입니다.");
+#elif HIT_NUM==7
+  puts("매크로 상수 HIT_NUM은 현재 7입니다.");
+#else
+  puts("매크로 상수 HIT_NUM은 현재 5입니다.");
+#endif
+  return 0;
+}
 
 
 
