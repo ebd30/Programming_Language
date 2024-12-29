@@ -202,7 +202,163 @@ int main(void)
 이렇듯 상대경로를 기반으로 헤더파일을 선언하면, 드라이브 명이나 디렉터리 위치에 덜 영향을 받는다. 때문에 실제로는 상대경로를 기반으로 헤더파일이 선언되며, 그렇기 때문에 사용자는 상대경로를 이용하는 습관을 들여야 한다.
 
   -헤더파일에 무엇을 담으면 좋겠습니까?
+기본적으로 헤더파일에는 다음과 같은 유형의 선언을 담게 된다.
+extern int num;
+extern int GetNum(void); // extern 생략 가능
 
+외부에 선언된 변수에 접근하거나 외부에 정의된 함수를 호출하기 위한 선언들인데, 이들은 둘 이상의 소스파일로 이뤄진 프로그램에서 당연히 삽입될 수 밖에 없는 유형의 선언들이다. 그런데 필요할 때마다 매번 삽입하는 것은 번거롭다.
+따라서 이들 선언을 헤더파일에 모아두고 필요할 때마다 헤더파일을 포함시키는 방법을 택한다. 이와 관련해 다음 예제를 보자. 예제는 총 7개의 파일로 이뤄져있다.
+예제basicArith.h
+#define PI 3.1415
+double Add(double num1, double num2);
+double Min(double num1, double num2);
+double Mul(double num1, double num2);
+double Div(double num1, double num2);
 
-  
+예제basicArith.h
+double Add(double num1, double num2)
+{
+  return num1+num2;
+}
+double Min(double num1, double num2)
+{
+  return num1-num2;
+}
+double Mul(double num1, double num2)
+{
+  return num1*num2;
+}
+double Div(double num1, double num2)
+{
+  return num1/num2;
+}
+
+basicArith.c에는 사칙연산의 기능을 제공하는 함수들이 정의돼있다. 그리고 이 함수들의 선언을 basicArith.h에 모아두었으므로 basicArith.c에 정의된 함수의 호출을 위해서는 헤더파일 basicArith.h를 포함시켜야한다.
+
+그리고 '매크로의 명령문도 파일 단위로만 유효'하기 때문에(선행처리기도 파일 단위로 선행처리한다.) 매크로 PI에 대한 정의가 헤더파일 basicArith.h에 삽입됐다.때문에 매크로 PI를 필요로 하는 소스파일은 헤더파일 basicArith.h를 포함시키기만 하면 된다.
+
+예제areaArith.h
+double TriangleArea(double base, double height);
+double CircleArea(double rad);
+
+예제areaArith.c
+#include "basicArith.h"
+double TriangleArea(double base, double height)
+{
+  return Div(Mul(base, heigth), 2);
+}
+double CircleArea(double rad)
+{
+  return Mul(Mul(rad, rad), PI);
+}
+
+areaArith.c에는 면적을 구하는 함수들이 정의돼있다. 그런데 이 함수들은 basicArith.c에 정의된 함수를 호출하기 때문에 헤더파일 basicArith.h를 포함시켜야 한다.
+
+예제roundArith.h
+double RectangleRound(double base, double height);
+double SquareRound(double side);
+
+예제roundArith.c
+#include "basicArith.h"
+double RectnagleRound(double base, double height)
+{
+  return Mul(Add(base, height), 2);
+}
+double SquareRound(double side)
+{
+  return Mul(side, 4);
+}
+
+roundArith.c에는 둘레를 구하는 함수들이 정의돼있다. 이 함수들 역시 basicArith.c에 정의된 함수를 호출하기 때문에 헤더파일 basicArith.h를 포함시켜야 한다.
+
+잠깐 헤더파일의 유용함을 관찰하자면 만약 헤더파일 basicArith.h가 존재하지 않았다면, 소스파일 areaArith.c, roundArith.c에서 호출하고 있는 함수의 선언을 각각의 소스파일에 추가해야한다. 번거로운 과정을 거쳐야만 하는 것이다.
+그러나 헤더파일을 만들었기 때문에 한 줄의 #include 문으로 모든 것이 해결됐다. 이것이 바로 헤더파일의 유용함이다. 
+
+예제main.c
+#include <stdio.h>
+#include "areaArith.h"
+#include "roundArith.h"
+int main()
+{
+  printf("삼각형 넓이(밑변 4, 높이 2): %g \n", TriangleArea(4, 2));
+  printf("원 넓이(반지름 3): %g \n", CircleArea(3));
+
+  printf("직사각형 둘레(밑변 2.5, 높이 5.2): %g \n", RectangleRound(2.5, 5.2));
+  printf("정사각형 둘레(변의 길이 3): %g \n", SquareRound(3));
+  return 0;
+}
+
+  -구조체의 정의는 어디에 둘까요? 그런데 중복은 안됩니다.
+구조체는 프로그램 개발에서 빠질 수 없는 중요한 요소이다. 그렇다면 구조체의 선언(typedef 선언)및 정의는 어디에 두는 것이 정답일까? 소스파일일까 아님 헤더파일일까? 
+두 개의 파일로 이뤄진 다음 예제를 참조해 감을 잡아보자.
+
+예제intdiv.c
+typedef struct div
+{
+  int quotient; // 몫
+  int remainder; // 나머지
+} Div;
+Div IntDiv(int num1, int num2)
+{
+  Div dval;
+  dval.quotient=num1/num2;
+  dval.remainder=num1%num2;
+  return dval;
+}
+
+예제main.c
+#include <stdio.h>
+typedef struct div
+{
+  int quotient; // 몫
+  int remainder; // 나머지
+} Div;
+extern Div IntDiv(int num1, int num2);
+int main()
+{
+  Div val=IntDiv(5, 2);
+  printf("몫: %d \n", val.quotient);
+  printf("나머지: %d \n", val.remainder);
+  return 0;
+}
+
+분석하는 과정에서 다음 사실에 놀라지 않을 수 없다. 구조체 Div의 선언 및 정의가 두 번씩이나 삽입됐다는 사실이다.
+처음 보면 상당히 이상하게 보이지만 앞서 설명한 다음 사실을 기억하면 전혀 이상하지 않다. 컴파일러는 파일 단위로 컴파일을 진행한다.
+
+컴파일러는 다른 파일의 정보를 참조해 컴파일을 진행하지 않는다. 때문에 구조체 Div에 대한 선언 및 정의는 Div를 필요로 하는 모든 파일에 존재해야 한다.
+헤더파일을 만들어 Div의 선언 및 정의가 프로그램 내에서 하나만 존재하도록 개선가능하다. 동일한 구조체의 정의가 두 군데 이상 존재하면 구조체의 수정 및 확장에 불편함이 따르기 때문이다.
+
+예제stdiv.h
+typedef struct div
+{
+  int quotient; // 몫
+  int remainder; // 나머지
+} Div;
+
+예제intdiv2.c
+#include "stdiv.h"
+Div IntDiv(int num1, int num2)
+{
+  Div dval;
+  dval.quotient=num1/num2;
+  dval.remainder=num1%num2;
+  return dval;
+}
+
+예제main.c
+#include <stdio.h>
+#include "stdiv.h"
+extern Div IntDiv(int num1, int num2);
+int main()
+{
+  Div val=IntDiv(5, 2);
+  printf("몫: %d \n", val.quotient);
+  printf("나머지: %d \n", val.remainder);
+  return 0;
+}
+
+구조체의 선언 및 정의는 헤더파일에 삽입하는 것이 좋다. 그러나 하나의 소스파일 내에서만 사용되는 구조체라면 소스파일에 정의하는 것도 좋다.
+
+  -헤더파일의 중복삽입 문제
+
 */
