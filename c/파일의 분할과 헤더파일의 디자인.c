@@ -420,9 +420,58 @@ void Increment(void);
 하지만 구조체의 정의는 얘기가 다르다. 이는 컴파일을 하는데 도움을 주는 정보가 아닌, 실행파일의 내용에 직접적인 연관이 있는 정보다. 구조체를 어떻게 정의하냐에 따라 실행파일의 크기뿐 아니라 실행파일의 내용도 달라지기에 이러한 형태의 정의는 두 번 이상 중복 불가하다.
 
   -조건부 컴파일을 활용한 중복삽입 문제의 해결
+헤더파일의 중복삽입에 대한 해결책은 '조건부 컴파일을 위한 매크로'에서 찾을 수 있다. 
 
+예제stdiv2.h
+#ifndef __STDIV2_H__
+#define __STDIV2_H__
 
+typedef struct div
+{
+  int quotient; // 몫
+  int remainder; // 나머지
+} Div;
 
+#endif
+
+위의 파일은 앞서 중복삽입으로 문제됐던 헤더파일이다. 그런데 이 파일의 #ifndef __STDIV2_H__, #define __STDIV2_H__, #endif를 통해 중복삽입을 막을 수 있다.
+이 파일을 처음 포함하는 소스파일은 __STDIV2_H__라는 이름의 매크로가 정의되지 않은 상태이므로 구조체의 정의 및 선언을 포함하게 된다. 때문에 #define __STDIV2_H__에 의해서 매크로 __STDIV2_H__가 정의되고 이어서 구조체 Div가 정의된다.
+그리고 이후 이 파일을 다시 포함하는 경우 매크로 __STDIV2_H__가 정의된 상태이므로 stdiv2.h의 내용은 포함되지 않는다. 결국 구조체 Div는 소스파일 당 하나씩만 정의되는 것이다.
+
+예제intdiv4.h
+#ifndef __INTDIV4_H__
+#define __INTDIV4_H__
+
+#include "stdiv2.h"
+Div IntDiv(int num1, int num2);
+#endif
+
+위의 파일은 중복삽입으로 인한 문제를 일으켰던 헤더파일은 아니다. 하지만 헤더파일에 존재하는 내용은 이렇듯 #ifndef~#endif를 이용해 중복삽입의 문제를 미연에 방지하는 것이 좋다.
+
+예제intdiv4.c
+#include "stdiv2.h"
+Div IntDiv(int num1, int num2)
+{
+  Div dval;
+  dval.quotient=num1/num2;
+  dval.remainder=num1%num2;
+  return dval;
+}
+
+예제main.c
+#include <stdio.h>
+#include "stdiv2.h"
+#include "intdiv4.h"
+
+int main()
+{
+  Div val=IntDiv(5, 2);
+  printf("몫: %d \n", val.quotient);
+  printf("나머지: %d \n", val.remainder);
+  return 0;
+}
+위의 main.c에서는 stdiv2.h를 두 번 포함하려 든다. 하지만 stdiv2.h에 삽입된 매크로 지시자 #ifndef~#endif에 의해 중복삽입으로 인한 문제는 발생하지 않는다. 
+이로써 헤더파일을 디자인하고 파일을 분할하여 프로그램을 작성하는데 필요한 이론적인 것을 다 살펴보았다.
 
 
 */
