@@ -360,5 +360,69 @@ int main()
 구조체의 선언 및 정의는 헤더파일에 삽입하는 것이 좋다. 그러나 하나의 소스파일 내에서만 사용되는 구조체라면 소스파일에 정의하는 것도 좋다.
 
   -헤더파일의 중복삽입 문제
+일단 구조체의 선언 및 정의는 헤더파일에 삽입하는 것이 좋다는 결론이 내려졌지만 이는 자칫 컴파일 에러의 원인으로 이어질 수 있어 주의해야한다.
+총 네 개의 파일로 이뤄진 다음 예제를 통해 주의할 점을 살펴보자.
+
+예제stdiv.h
+typedef struct div
+{
+  int quotient; // 몫
+  int remainder; // 나머지
+} Div;
+
+예제intdiv3.c
+#include "stdiv.h"
+Div IntDiv(int num1, int num2)
+{
+  Div dval;
+  dval.quotient=num1/num2;
+  dval.remainder=num1%num2;
+  return dval;
+}
+위 소스파일에는 헤더파일 stdiv.h를 포함하고 있다. IntDiv 함수에서 구조체 Div의 변수를 선언하니 당연하다.
+
+예제intdiv3.h
+#include "stdiv.h"
+Div IntDiv(int num1, int num2);
+
+위의 헤더파일은 소스파일 intdiv3.c에서 정의한 함수의 선언을 담고 있다. 그런데 함수의 선언에서 구조체 Div가 반환형으로 선언돼있기 때문에 헤더파일 stdiv.h를 포함해야한다.
+
+예제main.c
+#include <stdio.h>
+#include "stdiv.h"
+#include "intdiv3.h"
+
+int main()
+{
+  Div val=IntDiv(5, 2);
+  printf("몫: %d \n", val.quotient);
+  printf("나머지: %d \n", val.remainder);
+  return 0;
+}
+
+위 main.c에서는 intdiv3.h를 포함하고 있다. IntDiv 함수를 호출하고 있기 때문이다. 그리고 stdiv.h를 포함하고 있다. Div형 변수를 선언하고 있기 때문이다.
+이렇듯 이 예제는 파일을 하나씩만 놓고 보면 문제되리 것이 없어보인다. 하지만 파일들을 묶어놓으면 문제가 생긴다. 헤더파일의 중복 포함의 문제가 생긴다.
+
+다음 문장에 의해서 stdiv.h를 한 번 포함한다.
+#include "stdiv.h"
+그리고 다음 문장에 의해 stdiv.h를 한 번 더 포함한다. 왜냐하면 헤더파일 intdiv3.h가 stdiv.h를 포함하고 있기 때문이다.
+#include "intdiv3.h"
+
+결과적으로 main.c에서 구조체 Div가 두 번 정의된 형태가 되어 컴파일 에러가 발생한다. 
+
+  -헤더파일을 중복해서 삽입하면 문제가 되나요?
+헤더파일의 중복삽입 자체는 문제가 되지 않는다. 특히 다음과 같은 유형의 선언은 두 번 이상 삽입돼도 컴파일 오류가 발생하지 않는다. 왜냐하면 이는 컴파일러에게 전달하는 메시지에 지나지 않기 때문이다.
+
+extern int num;
+void Increment(void);
+
+컴파일러에게 메시지를 두 번 이상 전달한다고 해서 문제가 되진 않는다. 그리고 이러한 유형의 선언은 실행파일의 크기와도 상관이 없다(컴파일러가 컴파일을 할 수 있도록 도움을 줄 뿐이므로).
+하지만 구조체의 정의는 얘기가 다르다. 이는 컴파일을 하는데 도움을 주는 정보가 아닌, 실행파일의 내용에 직접적인 연관이 있는 정보다. 구조체를 어떻게 정의하냐에 따라 실행파일의 크기뿐 아니라 실행파일의 내용도 달라지기에 이러한 형태의 정의는 두 번 이상 중복 불가하다.
+
+  -조건부 컴파일을 활용한 중복삽입 문제의 해결
+
+
+
+
 
 */
