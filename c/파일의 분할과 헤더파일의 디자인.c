@@ -143,6 +143,38 @@ static void MinCnt(void)
 #헤더파일의 디자인과 활용
 
 
+  -#include 지시자의 의미를 알면 헤더파일을 완전히 이해할 수 있습니다.
+먼저 #include 지시자의 의미를 이해하면 헤더파일을 이해할 수 있을 뿐 아니라, 헤더파일에 무엇을 담아야 할지도 알 수 있게 된다.
+
+예제header1.h
+{
+  puts("Hello World!");
+
+예제header2.h
+  return 0;
+}
+
+예제main.c
+#include <stdio.h>
+
+int main(void)
+#include "header1.h"
+#include "header2.h"
+
+언뜻 보면 정상적인 프로그램인가? 하는 의심이 든다. 하지만 정상적인 프로그램이 맞다. 일단 프로그램의 분석을 위해 다음 문장의 의미를 설명하자면
+#include "header1.h"
+이는 다음과 같은 메시지를 선행처리기에게 전달하는 것이다.
+"이 문장의 위치에다가 header1.h에 저장된 내용을 가져다 놓으세요."
+유사하게 main.c의
+#include "header2.h"
+문장도 마찬가지로
+"이 문장의 위치에다가 header2.h에 저장된 내용을 가져다 놓으세요."
+
+이처럼 #include 지시자는 그 이름이 의미하듯이 파일의 내용을 단순히 포함시키는 용도로 사용된다. 단순한 '포함'일 뿐이다.
+
+
+
+
 
   
 */
